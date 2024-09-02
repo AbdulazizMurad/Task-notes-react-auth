@@ -1,6 +1,10 @@
-import React, { useState } from "react";
-
+import { useMutation } from "@tanstack/react-query";
+import React, { useContext, useState } from "react";
+import { login } from "../api/auth";
+import UserContext from "../context/UserContext";
+import { Navigate } from "react-router-dom";
 const Login = () => {
+  const [user, setUser] = useContext(UserContext);
   const [userInfo, setUserInfo] = useState({});
 
   const handleChange = (e) => {
@@ -10,12 +14,24 @@ const Login = () => {
   const handleFormSubmit = (e) => {
     e.preventDefault();
     // Add login logic here
+    handleLogin();
   };
+  const { mutate: handleLogin } = useMutation({
+    mutationKey: ["Login"],
+    mutationFn: () => login(userInfo),
+    onSuccess: () => {
+      setUser(true);
+    },
+  });
+  if (user) {
+    return <Navigate to={"/"} />;
+  }
 
   return (
     <div className="bg-gray-900 min-h-screen flex items-center justify-center absolute inset-0 z-[-1]">
       <div className="max-w-md w-full px-6 py-8 bg-gray-800 rounded-md shadow-md">
         <h2 className="text-3xl text-white font-semibold mb-6">Login</h2>
+        <h1 className="text-white">{`${user}`}</h1>
         <form onSubmit={handleFormSubmit}>
           <div className="mb-4">
             <label
